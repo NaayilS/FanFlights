@@ -1,7 +1,7 @@
-// server.js
 import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import apiRoutes from './routes/apiRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -16,6 +16,10 @@ app.use(express.json());
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
+
+
+// Use API routes
+app.use('/api', apiRoutes);
 
 // Basic route to check server status
 app.get('/', (req, res) => {

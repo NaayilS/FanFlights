@@ -1,5 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
+import Amadeus from 'amadeus';
 
 dotenv.config();
 
@@ -25,13 +26,24 @@ export const getGameTickets = async (teamName) => {
     }
 };
 
-// Fetch flight data from Aviationstack
+const amadeus = new Amadeus({
+    clientId: process.env.AMADEUS_API_KEY,
+    clientSecret: process.env.AMADEUS_API_SECRET
+});
+
+// Fetch flight data from Amadeus
 export const getFlights = async (origin, destination, date) => {
     try {
-        const response = await axios.get(`http://api.aviationstack.com/v1/flights?access_key=${process.env.AVIATIONSTACK_API_KEY}&dep_iata=${origin}&arr_iata=${destination}&flight_date=${date}`);
-        return response.data.data;
+        const response = await amadeus.shopping.flightOffersSearch.get({
+            originLocationCode: origin,
+            destinationLocationCode: destination,
+            departureDate: date,
+            adults: '1'
+        });
+
+        return response.data;
     } catch (error) {
-        console.error('Error fetching flights:', error);
+        console.error('Error fetching flights:', error.response ? error.response.data : error.message);
         throw error;
     }
 };
