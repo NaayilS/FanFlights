@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import apiRoutes from './routes/apiRoutes.js';
+import tripRoutes from './routes/tripRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -20,6 +21,9 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 
 // Use API routes
 app.use('/api', apiRoutes);
+
+// Use trip routes
+app.use('/api/trips', tripRoutes);
 
 // Basic route to check server status
 app.get('/', (req, res) => {
