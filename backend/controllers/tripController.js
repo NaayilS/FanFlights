@@ -26,3 +26,18 @@ export const getTrips = async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch trips' });
     }
 };
+
+// Update a trip
+export const updateTrip = async (req, res) => {
+    const { id } = req.params;
+    const { flightDetails, gameDetails } = req.body;
+
+    try {
+        const updatedTrip = await Trip.findByIdAndUpdate(id, { flightDetails, gameDetails }, { new: true });
+        res.status(200).json(updatedTrip);
+    } catch (error) {
+        console.error('Error updating trip:', error);
+        res.status(500).json({ message: 'Failed to update trip' });
+    }
+};
+
