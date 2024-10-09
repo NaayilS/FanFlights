@@ -1,12 +1,15 @@
 import express from 'express';
 import { getNBASchedules, getGameTickets, getFlights } from '../controllers/apiService.js';
 
+
 const router = express.Router();
 
 // Route to get NBA schedules
 router.get('/nba-schedules', async (req, res) => {
+    const team = req.query.team || req.user.favoriteTeam;  // Use favorite team if none provided
+
     try {
-        const schedules = await getNBASchedules();
+        const schedules = await getNBASchedules(team);  
         res.status(200).json(schedules);
     } catch (error) {
         console.error('Error fetching NBA schedules:', error);
