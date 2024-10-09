@@ -6,15 +6,15 @@ const router = express.Router();
 
 // User registration
 router.post('/register', async (req, res) => {
-    const { username, password, favoriteTeam } = req.body;
+    const { username, email, password, favoriteTeam } = req.body;
 
     try {
-        const userExists = await User.findOne({ username });
+        const userExists = await User.findOne({ email });
         if (userExists) {
-            return res.status(400).json({ message: 'Username already taken' });
+            return res.status(400).json({ message: 'Email already taken' });
         }
 
-        const newUser = new User({ username, password, favoriteTeam });
+        const newUser = new User({ username, email, password, favoriteTeam });
         await newUser.save();
 
         const token = jwt.sign({ userId: newUser._id, favoriteTeam: newUser.favoriteTeam }, process.env.JWT_SECRET, { expiresIn: '1h' });

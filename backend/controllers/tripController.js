@@ -2,10 +2,15 @@ import Trip from '../models/trip.js';
 
 // Create a new trip
 export const createTrip = async (req, res) => {
-    const { userId, flightDetails, gameDetails } = req.body;
+    const { flightDetails, gameDetails } = req.body;
 
     try {
-        const newTrip = new Trip({ userId, flightDetails, gameDetails });
+        const newTrip = new Trip({
+            userId: req.user.userId,  // Get the userId from the JWT token
+            flightDetails,
+            gameDetails
+        });
+
         await newTrip.save();
         res.status(201).json(newTrip);
     } catch (error) {
