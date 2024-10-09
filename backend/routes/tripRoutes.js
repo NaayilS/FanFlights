@@ -1,6 +1,7 @@
 import express from 'express';
 import { createTrip, getTrips, updateTrip, deleteTrip } from '../controllers/tripController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { updateTripStatus } from '../controllers/tripController.js';
 
 const router = express.Router();
 
