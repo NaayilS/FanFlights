@@ -1,11 +1,12 @@
 import express from 'express';
 import { getNBASchedules, getGameTickets, getFlights } from '../controllers/apiService.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 
 const router = express.Router();
 
 // Route to get NBA schedules
-router.get('/nba-schedules', async (req, res) => {
+router.get('/nba-schedules', protect, async (req, res) => {
     const team = req.query.team || req.user.favoriteTeam;  // Use favorite team if none provided
 
     try {
