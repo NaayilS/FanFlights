@@ -2,13 +2,19 @@ import Trip from '../models/trip.js';
 
 // Create a new trip
 export const createTrip = async (req, res) => {
-    const { flightDetails, gameDetails } = req.body;
+    const { flightDetails, gameDetails, gameCost, flightCost } = req.body;
 
     try {
+        // Calculate total cost
+        const totalCost = gameCost + flightCost;
+
         const newTrip = new Trip({
-            userId: req.user.userId,  // Get the userId from the JWT token
+            userId: req.user.userId,  // Get userId from JWT token
             flightDetails,
-            gameDetails
+            gameDetails,
+            gameCost,
+            flightCost,
+            totalCost  // Store total cost
         });
 
         await newTrip.save();
@@ -19,12 +25,15 @@ export const createTrip = async (req, res) => {
     }
 };
 
+
 // Get all trips for a user
 export const getTrips = async (req, res) => {
     const { userId } = req.params;
 
     try {
         const trips = await Trip.find({ userId });
+
+        // Send back the trips with total cost for each
         res.status(200).json(trips);
     } catch (error) {
         console.error('Error fetching trips:', error);

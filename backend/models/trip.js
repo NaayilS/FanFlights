@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+
 const tripSchema = new mongoose.Schema({
     userId: {
         type: String,
@@ -28,3 +30,7 @@ const tripSchema = new mongoose.Schema({
         default: Date.now
     }
 });
+// Create the Trip model
+const Trip = mongoose.model('Trip', tripSchema);
+
+export default Trip;
