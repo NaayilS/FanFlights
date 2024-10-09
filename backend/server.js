@@ -4,13 +4,20 @@ import mongoose from 'mongoose';
 import apiRoutes from './routes/apiRoutes.js';
 import tripRoutes from './routes/tripRoutes.js';
 import authRoutes from './routes/authRoutes.js';
-
+import cors from 'cors';
 
 // Load environment variables
 dotenv.config();
 
 // Initialize express app
 const app = express();
+
+//Connect Backend to Frontend using cors
+const corsOptions = {
+    origin: 'http://localhost:5173',
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
 // Middleware to parse JSON
 app.use(express.json());
