@@ -25,6 +25,11 @@ const tripSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    status: {
+        type: String,
+        enum: ["Saved", "Booked", "Completed"], 
+        default: "Saved"
+    },
     createdAt: {
         type: Date,
         default: Date.now

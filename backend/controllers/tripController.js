@@ -55,6 +55,25 @@ export const updateTrip = async (req, res) => {
     }
 };
 
+//Update Status (saved,booked,complete)
+export const updateTripStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    try {
+        const validStatuses = ["Saved", "Booked", "Completed"];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({ message: "Invalid status" });
+        }
+
+        const updatedTrip = await Trip.findByIdAndUpdate(id, { status }, { new: true });
+        res.status(200).json(updatedTrip);
+    } catch (error) {
+        console.error('Error updating trip status:', error);
+        res.status(500).json({ message: 'Failed to update trip status' });
+    }
+};
+
 // Delete a trip
 export const deleteTrip = async (req, res) => {
     const { id } = req.params;

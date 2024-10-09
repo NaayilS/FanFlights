@@ -13,6 +13,9 @@ router.get('/:userId', protect, getTrips);
 // Route to update a trip
 router.put('/:id', protect, updateTrip);
 
+//Route to update status
+router.put('/status/:id', protect, updateTripStatus);
+
 // Route to delete a trip
 router.delete('/:id', protect, deleteTrip);
 
