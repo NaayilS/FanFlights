@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css'; // Import calendar styles
+
+const localizer = momentLocalizer(moment);
 
 function NBAList({ onGameSelect }) {
     const [schedule, setSchedule] = useState([]);
@@ -9,34 +14,29 @@ function NBAList({ onGameSelect }) {
             .then((data) => setSchedule(data));
     }, []);
 
-      // Function to convert UTC to local time
-      const convertToLocalTime = (utcDate) => {
-        const date = new Date(utcDate);  // Create a date object from the UTC string
-        return date.toLocaleString(undefined, { 
-            timeZoneName: 'short', // Displays time zone abbreviation (e.g., PST, EST)
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true,          // Use 12-hour clock format
-            weekday: 'long',       // Display day of the week
-            month: 'long',         // Display full month
-            day: 'numeric',        // Display day of the month
-            year: 'numeric'        // Display full year
-        });
-    };
+    const events = schedule.map((game) => ({
+        title: `${game.HomeTeam} vs. ${game.AwayTeam}`,
+        start: new Date(game.DateUtc), // Convert UTC to Date object
+        end: new Date(game.DateUtc),   // Assume the game lasts around 2-3 hours
+        allDay: false,
+        gameData: game // Store the entire game data for further use
+    }));
 
+    const handleSelectEvent = (event) => {
+        onGameSelect(event.gameData);  // Pass the selected game to the parent component
+    };
 
     return (
         <div>
             <h2>Select an NBA Game</h2>
-            <ul>
-                {schedule.map((game, index) => (
-                    <li key={index}>
-                        <button onClick={() => onGameSelect(game)}>
-                            {new Date(game.DateUtc).toLocaleDateString()} - {game.HomeTeam} vs. {game.AwayTeam} at {game.Location}
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            <Calendar
+                localizer={localizer}
+                events={events}
+                startAccessor="start"
+                endAccessor="end"
+                style={{ height: 500 }}
+                onSelectEvent={handleSelectEvent}  // Trigger selection on clicking an event
+            />
         </div>
     );
 }
