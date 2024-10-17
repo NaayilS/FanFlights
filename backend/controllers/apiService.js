@@ -1,30 +1,7 @@
-import axios from 'axios';
-import dotenv from 'dotenv';
 import Amadeus from 'amadeus';
+import dotenv from 'dotenv';
 
 dotenv.config();
-
-// Fetch NBA schedules from The Sports DB
-export const getNBASchedules = async () => {
-    try {
-        const response = await axios.get(`https://www.thesportsdb.com/api/v1/json/${process.env.SPORTS_DB_API_KEY}/eventsnextleague.php?id=4387`);
-        return response.data.events;
-    } catch (error) {
-        console.error('Error fetching NBA schedules:', error);
-        throw error;
-    }
-};
-
-// Fetch available game tickets from Ticketmaster
-export const getGameTickets = async (teamName) => {
-    try {
-        const response = await axios.get(`https://app.ticketmaster.com/discovery/v2/events.json?keyword=${teamName}&apikey=${process.env.TICKETMASTER_API_KEY}`);
-        return response.data._embedded.events;
-    } catch (error) {
-        console.error('Error fetching game tickets:', error);
-        throw error;
-    }
-};
 
 const amadeus = new Amadeus({
     clientId: process.env.AMADEUS_API_KEY,
@@ -32,16 +9,29 @@ const amadeus = new Amadeus({
 });
 
 // Fetch flight data from Amadeus
-export const getFlights = async (origin, destination, date) => {
+export const getFlights = async (origin, destination, date, passengers = 1) => {
     try {
         const response = await amadeus.shopping.flightOffersSearch.get({
             originLocationCode: origin,
             destinationLocationCode: destination,
             departureDate: date,
-            adults: '1'
+            adults: passengers,
+            max: 5  // Adjust this as needed for the number of flights to retrieve
         });
 
-        return response.data;
+        // Map through the response to format necessary flight information
+        const flights = response.data.map(flight => ({
+            price: flight.price.total,  // Total price of the flight
+            airline: flight.validatingAirlineCodes[0],  // Airline
+            segments: flight.itineraries[0].segments,  // List of flight segments
+            departure: flight.itineraries[0].segments[0].departure,  // Departure info
+            arrival: flight.itineraries[0].segments.slice(-1)[0].arrival,  // Arrival info
+            passengers: passengers,  // Number of passengers
+            duration: flight.itineraries[0].duration  // Flight duration
+        }));
+
+        return flights;
+
     } catch (error) {
         console.error('Error fetching flights:', error.response ? error.response.data : error.message);
         throw error;
