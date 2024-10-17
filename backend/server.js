@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import apiRoutes from './routes/apiRoutes.js';
 import tripRoutes from './routes/tripRoutes.js';
-import authRoutes from './routes/authRoutes.js';
 import cors from 'cors';
 
 // Load environment variables
@@ -33,9 +32,6 @@ app.use('/api', apiRoutes);
 
 // Use trip routes
 app.use('/api/trips', tripRoutes);
-
-// Use authentication routes
-app.use('/api/auth', authRoutes);
 
 // Basic route to check server status
 app.get('/', (req, res) => {

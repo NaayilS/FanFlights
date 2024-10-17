@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const airportCodes = [
     { city: "Boston", code: "BOS" },
@@ -48,6 +49,8 @@ function FlightSearchPage() {
     const [departureSuggestions, setDepartureSuggestions] = useState([]);
     const [destinationSuggestions, setDestinationSuggestions] = useState([]);
 
+    const selectedGame = location.state?.selectedGame || {};
+
     const handleSearchFlights = () => {
         setLoading(true);
 
@@ -83,6 +86,17 @@ function FlightSearchPage() {
         setCityFunction(code); // Set the IATA code as the value
         setSuggestionsFunction([]); // Clear suggestions after selection
     };
+
+    const handleBookFlight = (flight) => {
+        // Redirect to the create trip page with selected flight and game
+        useNavigate('/create-trip', {
+            state: {
+                flight: flight,
+                game: selectedGame
+            }
+        });
+    };
+
 
     return (
         <div className="flight-search-page">
@@ -157,7 +171,7 @@ function FlightSearchPage() {
                                 To: {flight.arrival.city} at {new Date(flight.arrival.at).toLocaleString()} <br />
                                 Price: {flight.price} USD <br />
                             </p>
-                            <button>Book Flight</button>
+                            <button onClick={() => handleBookFlight(flight)}>Book Flight</button>
                         </div>
                     ))
                 ) : (
