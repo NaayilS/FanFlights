@@ -9,6 +9,7 @@ import UpdateTripPage from './pages/UpdateTripPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import Header from './components/Header';
+import Footer from './components/Footer';
 
 function App() {
     return (
@@ -24,6 +25,7 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
             </Routes>
+            <Footer />
         </Router>
     );
 }
