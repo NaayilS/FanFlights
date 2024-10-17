@@ -9,6 +9,11 @@ function CreateTripPage() {
     const handleSaveTrip = () => {
         const token = localStorage.getItem('token');  // Get the token
 
+        if (!token) {
+            alert('You need to be logged in to save the trip.');
+            return;
+        }
+
         const tripData = {
             flightDetails: flight,
             gameDetails: game,
@@ -21,22 +26,28 @@ function CreateTripPage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`  // Include token in request
             },
             body: JSON.stringify(tripData)
         })
-        .then((response) => response.json())
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Failed to save trip');
+            }
+            return response.json();
+        })
         .then((data) => {
             // Redirect to trip summary page with the newly created trip
             navigate('/trip-summary', { state: { trip: data } });
         })
         .catch((error) => {
             console.error('Error saving trip:', error);
+            alert('Failed to save the trip. Please try again.');
         });
     };
 
     if (!flight || !game) {
-        return <p>No flight or game details found. Please try again.</p>;
+        return <p>No flight or game details found. Please go back and select again.</p>;
     }
 
     return (
