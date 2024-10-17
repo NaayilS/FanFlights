@@ -1,15 +1,13 @@
 import Trip from '../models/trip.js';
 
-// Create a new trip
+// Create a new trip (already exists)
 export const createTrip = async (req, res) => {
     const { flightDetails, gameDetails, gameCost, flightCost } = req.body;
+    const totalCost = gameCost + flightCost;
 
     try {
-        // Calculate total cost
-        const totalCost = gameCost + flightCost;
-
         const newTrip = new Trip({
-            userId: req.user.userId,  // Get userId from JWT token
+            userId: req.user.userId,  // Get userId from Firebase token
             flightDetails,
             gameDetails,
             gameCost,
@@ -25,15 +23,12 @@ export const createTrip = async (req, res) => {
     }
 };
 
-
 // Get all trips for a user
 export const getTrips = async (req, res) => {
     const { userId } = req.params;
 
     try {
         const trips = await Trip.find({ userId });
-
-        // Send back the trips with total cost for each
         res.status(200).json(trips);
     } catch (error) {
         console.error('Error fetching trips:', error);
@@ -44,33 +39,15 @@ export const getTrips = async (req, res) => {
 // Update a trip
 export const updateTrip = async (req, res) => {
     const { id } = req.params;
-    const { flightDetails, gameDetails } = req.body;
+    const { flightDetails, gameDetails, flightCost, gameCost } = req.body;
+    const totalCost = flightCost + gameCost;
 
     try {
-        const updatedTrip = await Trip.findByIdAndUpdate(id, { flightDetails, gameDetails }, { new: true });
+        const updatedTrip = await Trip.findByIdAndUpdate(id, { flightDetails, gameDetails, flightCost, gameCost, totalCost }, { new: true });
         res.status(200).json(updatedTrip);
     } catch (error) {
         console.error('Error updating trip:', error);
         res.status(500).json({ message: 'Failed to update trip' });
-    }
-};
-
-//Update Status (saved,booked,complete)
-export const updateTripStatus = async (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    try {
-        const validStatuses = ["Saved", "Booked", "Completed"];
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({ message: "Invalid status" });
-        }
-
-        const updatedTrip = await Trip.findByIdAndUpdate(id, { status }, { new: true });
-        res.status(200).json(updatedTrip);
-    } catch (error) {
-        console.error('Error updating trip status:', error);
-        res.status(500).json({ message: 'Failed to update trip status' });
     }
 };
 

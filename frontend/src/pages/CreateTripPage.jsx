@@ -2,8 +2,8 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 function CreateTripPage() {
-    const location = useLocation();  // Access the passed flight and game details
-    const { flight, game } = location.state || {};  // Destructure flight and game from state
+    const location = useLocation();
+    const { flight, game } = location.state || {};  // Retrieve the flight and game data from state
     const navigate = useNavigate();
 
     const handleSaveTrip = () => {
@@ -13,11 +13,11 @@ function CreateTripPage() {
             flightDetails: flight,
             gameDetails: game,
             flightCost: flight.price,
-            gameCost: 100  // Assuming a fixed game cost for now; you can adjust this later
+            gameCost: 100  // Assume a fixed game cost, you can modify this
         };
 
-        // Send the trip data to the backend
-        fetch('/api/trips/create', {
+        // Send trip data to backend API to save the trip
+        fetch('http://localhost:5000/api/trips/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ function CreateTripPage() {
         })
         .then((response) => response.json())
         .then((data) => {
-            // Navigate to a success or summary page after saving the trip
+            // Redirect to trip summary page with the newly created trip
             navigate('/trip-summary', { state: { trip: data } });
         })
         .catch((error) => {
@@ -40,28 +40,22 @@ function CreateTripPage() {
     }
 
     return (
-        <div className="create-trip-page">
+        <div>
             <h1>Confirm Your Trip</h1>
 
-            <div className="trip-details">
-                <h2>Selected Game</h2>
-                <p>
-                    {game.HomeTeam} vs. {game.AwayTeam} <br />
-                    Location: {game.Location} <br />
-                    Date: {new Date(game.DateUtc).toLocaleString()}
-                </p>
+            <h2>Selected Game</h2>
+            <p>{game.HomeTeam} vs. {game.AwayTeam} at {game.Location} on {new Date(game.DateUtc).toLocaleString()}</p>
 
-                <h2>Selected Flight</h2>
-                <p>
-                    Airline: {flight.airline} <br />
-                    Flight Number: {flight.flightNumber} <br />
-                    From: {flight.departure.city} at {new Date(flight.departure.at).toLocaleString()} <br />
-                    To: {flight.arrival.city} at {new Date(flight.arrival.at).toLocaleString()} <br />
-                    Price: {flight.price} USD
-                </p>
+            <h2>Selected Flight</h2>
+            <p>
+                Airline: {flight.airline} <br />
+                Flight Number: {flight.flightNumber} <br />
+                Departure: {flight.departure.city} at {new Date(flight.departure.at).toLocaleString()} <br />
+                Arrival: {flight.arrival.city} at {new Date(flight.arrival.at).toLocaleString()} <br />
+                Price: ${flight.price}
+            </p>
 
-                <button onClick={handleSaveTrip}>Save Trip</button>
-            </div>
+            <button onClick={handleSaveTrip}>Save Trip</button>
         </div>
     );
 }
