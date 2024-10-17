@@ -1,46 +1,34 @@
 import React, { useState } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';  // Import Firebase auth instance
 import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = () => {
-        const loginData = { username, password };
-
-        // Send login data to the server
-        fetch('http://localhost:5000/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(loginData)
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.token) {
-                // Store the JWT token in localStorage
-                localStorage.setItem('token', data.token);
-                // Navigate to the homepage or NBA schedule page
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                // Store username in localStorage
+                localStorage.setItem('username', user.displayName);
+                // Navigate to home or NBA schedule
                 navigate('/');
-            } else {
-                setErrorMessage(data.message || 'Login failed');
-            }
-        })
-        .catch((error) => {
-            console.error('Error during login:', error);
-            setErrorMessage('An error occurred. Please try again.');
-        });
+            })
+            .catch((error) => {
+                setErrorMessage(error.message);
+            });
     };
 
     return (
         <div className="login-page">
             <h1>Login</h1>
             <div className="form-group">
-                <label>Username:</label>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter username" />
+                <label>Email:</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter email" />
             </div>
             <div className="form-group">
                 <label>Password:</label>

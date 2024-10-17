@@ -1,41 +1,34 @@
 import React, { useState } from 'react';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { auth } from '../firebase';  // Import the Firebase auth instance
 import { useNavigate } from 'react-router-dom';
 
 function RegisterPage() {
-    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
     const [favoriteTeam, setFavoriteTeam] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-
     const navigate = useNavigate();
 
     const handleRegister = () => {
-        const userData = { username, email, password, favoriteTeam };
-
-        // Send registration data to the server
-        fetch('http://localhost:5000/api/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(userData)
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.token) {
-                // Store the JWT token in localStorage
-                localStorage.setItem('token', data.token);
-                // Navigate to the login page or the homepage
-                navigate('/login');
-            } else {
-                setErrorMessage(data.message || 'Registration failed');
-            }
-        })
-        .catch((error) => {
-            console.error('Error during registration:', error);
-            setErrorMessage('An error occurred. Please try again.');
-        });
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                // Update the user's profile with the username
+                updateProfile(user, {
+                    displayName: username
+                }).then(() => {
+                    // Store the username and favorite team in localStorage (or handle it elsewhere)
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('favoriteTeam', favoriteTeam);
+                    // Navigate to home or login
+                    navigate('/');
+                });
+            })
+            .catch((error) => {
+                setErrorMessage(error.message);
+            });
     };
 
     return (

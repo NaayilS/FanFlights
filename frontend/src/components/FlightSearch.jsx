@@ -6,17 +6,26 @@ function FlightSearch({ selectedGame, onTripSave }) {
 
     const handleSearchFlights = () => {
         setLoading(true);
-        const origin = 'LAX';  // You can dynamically set this based on user's input
-        fetch(`/api/flights?origin=${origin}&destination=${selectedGame.Location}&date=${selectedGame.DateUtc}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setFlights(data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error('Error fetching flights:', error);
-                setLoading(false);
-            });
+    
+        const token = localStorage.getItem('token');  // Retrieve the token from localStorage
+    
+        // Fetch flights with the token included in the Authorization header
+        fetch(`http://localhost:5000/api/flights?origin=${departureCity}&destination=${destinationCity}&date=${travelDate}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`  // Include the token in the Authorization header
+            }
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            setFlights(data);
+            setLoading(false);
+        })
+        .catch((error) => {
+            console.error('Error fetching flights:', error);
+            setLoading(false);
+        });
     };
 
     const handleSelectFlight = (flight) => {

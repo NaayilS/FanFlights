@@ -52,7 +52,7 @@ function FlightSearchPage() {
         setLoading(true);
 
         // Fetch flights based on the provided inputs
-        fetch(`/api/flights?origin=${departureCity}&destination=${destinationCity}&date=${travelDate}`)
+        fetch(`http://localhost:5000/api/flights?origin=${departureCity}&destination=${destinationCity}&date=${travelDate}`)
             .then((response) => response.json())
             .then((data) => {
                 setFlights(data);

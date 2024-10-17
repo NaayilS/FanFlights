@@ -1,11 +1,10 @@
 import express from 'express';
 import { getFlights } from '../controllers/apiService.js';
-import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 // Route to get flight data from Amadeus
-router.get('/flights', protect, async (req, res) => {
+router.get('/flights', async (req, res) => {
     const { origin, destination, date, passengers } = req.query;
     
     try {
