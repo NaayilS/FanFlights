@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const airportCodes = [
     { city: "Boston", code: "BOS" },
@@ -48,13 +48,15 @@ function FlightSearchPage() {
     const [loading, setLoading] = useState(false);
     const [departureSuggestions, setDepartureSuggestions] = useState([]);
     const [destinationSuggestions, setDestinationSuggestions] = useState([]);
-
+    
+    const location = useLocation();
     const selectedGame = location.state?.selectedGame || {};
+
+    const navigate = useNavigate();
 
     const handleSearchFlights = () => {
         setLoading(true);
-
-        // Fetch flights based on the provided inputs
+        // Fetch flights based on inputs
         fetch(`http://localhost:5000/api/flights?origin=${departureCity}&destination=${destinationCity}&date=${travelDate}`)
             .then((response) => response.json())
             .then((data) => {
@@ -67,10 +69,19 @@ function FlightSearchPage() {
             });
     };
 
-    // Filter suggestions based on input
+    const handleBookFlight = (flight) => {
+        // Redirect to create trip page, passing selected flight and game details
+        navigate('/create-trip', {
+            state: {
+                flight,
+                game: selectedGame
+            }
+        });
+    };
+
+    // Suggestions for city input
     const handleCityInput = (input, setCityFunction, setSuggestionsFunction) => {
         setCityFunction(input);
-
         if (input.length > 0) {
             const filteredSuggestions = airportCodes.filter((airport) =>
                 airport.city.toLowerCase().startsWith(input.toLowerCase())
@@ -83,26 +94,19 @@ function FlightSearchPage() {
 
     // Select suggestion
     const handleSuggestionSelect = (city, code, setCityFunction, setSuggestionsFunction) => {
-        setCityFunction(code); // Set the IATA code as the value
-        setSuggestionsFunction([]); // Clear suggestions after selection
+        setCityFunction(code);
+        setSuggestionsFunction([]);
     };
-
-    const handleBookFlight = (flight) => {
-        // Redirect to the create trip page with selected flight and game
-        useNavigate('/create-trip', {
-            state: {
-                flight: flight,
-                game: selectedGame
-            }
-        });
-    };
-
 
     return (
         <div className="flight-search-page">
-            <h1>Airline Booking App</h1>
+            <h1>Choose Your Flight!</h1>
+            <p>
+                Selected Game: {selectedGame.HomeTeam} vs. {selectedGame.AwayTeam} <br />
+                Location: {selectedGame.Location} <br />
+                Date: {new Date(selectedGame.DateUtc).toLocaleDateString()}
+            </p>
 
-            {/* Input fields for flight search */}
             <div className="search-form">
                 <label>
                     Departure City (IATA code):
@@ -160,7 +164,6 @@ function FlightSearchPage() {
                 </button>
             </div>
 
-            {/* Display flight results */}
             <div className="flight-results">
                 {flights.length > 0 ? (
                     flights.map((flight, index) => (
