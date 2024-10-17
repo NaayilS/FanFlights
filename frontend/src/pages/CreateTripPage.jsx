@@ -18,7 +18,7 @@ function CreateTripPage() {
             flightDetails: flight,
             gameDetails: game,
             flightCost: flight.price,
-            gameCost: 100  // Assume a fixed game cost, you can modify this
+            gameCost: 1  // Assume a fixed game cost, you can modify this
         };
 
         // Send trip data to backend API to save the trip
